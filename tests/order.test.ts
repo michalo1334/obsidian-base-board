@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  compareAutomaticCardPaths,
   compareOrderValues,
   generateOrderKey,
   generateOrderKeys,
+  isManualCardOrderEnabled,
   isOrderKey,
   readOrderValue,
 } from "../src/order";
@@ -47,5 +49,11 @@ describe("fractional card ordering", () => {
     expect(readOrderValue("a0")).toBe("a0");
     expect(isOrderKey(generateOrderKey(null, null))).toBe(true);
     expect(isOrderKey("not a generated key")).toBe(false);
+  });
+
+  it("ORDER-MODE-01 [Unit] WHEN manual order is disabled THEN cards SHALL use automatic path order", () => {
+    expect(isManualCardOrderEnabled(false)).toBe(false);
+    expect(isManualCardOrderEnabled(undefined)).toBe(true);
+    expect(compareAutomaticCardPaths("card-2.md", "card-10.md")).toBeLessThan(0);
   });
 });

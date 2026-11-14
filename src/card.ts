@@ -707,7 +707,9 @@ export class CardManager {
         }
       }
       this.view.applyGroupByValue(fm, groupByProp, columnName);
-      fm[ORDER_PROPERTY] = targetOrder;
+      if (this.view.isManualCardOrder()) {
+        fm[ORDER_PROPERTY] = targetOrder;
+      }
     };
 
     try {

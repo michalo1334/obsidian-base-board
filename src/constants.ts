@@ -37,6 +37,9 @@ export const CONFIG_KEY_COVER_PROPERTY = "cardCoverProperty";
 /** Key used by BasesViewConfig.set/get to persist if new cards should be added to the top in the .base file. */
 export const CONFIG_KEY_ADD_TO_TOP = "newCardsToTop";
 
+/** Key used by BasesViewConfig.set/get to enable manual card order. */
+export const CONFIG_KEY_MANUAL_ORDER = "manualCardOrder";
+
 /** The Base Board-specific view-config keys. A `.base` view carrying any of
  * these was configured by Base Board, which lets the migration auto-identify
  * legacy `type: kanban` views that are really Base Board boards. */
@@ -49,6 +52,7 @@ export const BASE_BOARD_CONFIG_KEYS = [
   CONFIG_KEY_WIP_LIMITS,
   CONFIG_KEY_COVER_PROPERTY,
   CONFIG_KEY_ADD_TO_TOP,
+  CONFIG_KEY_MANUAL_ORDER,
 ];
 
 /**

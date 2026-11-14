@@ -6,6 +6,14 @@ import {
 
 export type OrderValue = string | number | null;
 
+export function isManualCardOrderEnabled(value: unknown): boolean {
+  return value !== false;
+}
+
+export function compareAutomaticCardPaths(a: string, b: string): number {
+  return a.localeCompare(b, undefined, { sensitivity: "base", numeric: true });
+}
+
 export function readOrderValue(value: unknown): OrderValue {
   if (typeof value === "string" && value.length > 0) return value;
   if (typeof value === "number" && Number.isFinite(value)) return value;

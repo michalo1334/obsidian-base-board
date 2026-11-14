@@ -45,7 +45,9 @@ You can customize the default click behavior (e.g. to always open in a floating 
 
 ### Card Ordering
 
-Base Board uses manual drag order so cards remain exactly where you place them. This order is stored in each note's `kanban_order` property and overrides the native Bases **Sort by** setting.
+Base Board uses manual drag order by default. This order is stored in each note's `kanban_order` property.
+
+Disable **Manual card order** in the view options to sort cards automatically by file name. In this mode, Base Board does not create or update `kanban_order`.
 
 ### Default Card Properties (`newItemProperties`)
 

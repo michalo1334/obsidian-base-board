@@ -19,8 +19,10 @@ import { ColumnManager } from "./column";
 import { CardManager } from "./card";
 import { Tags } from "./tags";
 import {
+  compareAutomaticCardPaths,
   compareOrderValues,
   generateOrderKeys,
+  isManualCardOrderEnabled,
   isOrderKey,
   OrderValue,
   readOrderValue,
@@ -36,6 +38,7 @@ import {
   CONFIG_KEY_WIP_LIMITS,
   CONFIG_KEY_COVER_PROPERTY,
   CONFIG_KEY_ADD_TO_TOP,
+  CONFIG_KEY_MANUAL_ORDER,
   VIEW_TYPE,
 } from "./constants";
 
@@ -174,6 +177,12 @@ export class KanbanView extends BasesView implements HoverParent {
             placeholder: "E.g. cover",
           },
           {
+            key: CONFIG_KEY_MANUAL_ORDER,
+            type: "toggle" as const,
+            displayName: "Manual card order",
+            default: true,
+          },
+          {
             key: CONFIG_KEY_ADD_TO_TOP,
             type: "toggle" as const,
             displayName: "Add new cards to top",
@@ -186,6 +195,10 @@ export class KanbanView extends BasesView implements HoverParent {
 
   public isAddNewCardsToTop(): boolean {
     return !!this.config?.get(CONFIG_KEY_ADD_TO_TOP);
+  }
+
+  public isManualCardOrder(): boolean {
+    return isManualCardOrderEnabled(this.config?.get(CONFIG_KEY_MANUAL_ORDER));
   }
 
   // ---------------------------------------------------------------------------
@@ -407,6 +420,9 @@ export class KanbanView extends BasesView implements HoverParent {
     pathA: string,
     pathB: string,
   ): number {
+    if (!this.isManualCardOrder()) {
+      return compareAutomaticCardPaths(pathA, pathB);
+    }
     const optimisticOrder = this.optimisticColumnOrders.get(columnName);
     if (optimisticOrder) {
       const indexA = optimisticOrder.indexOf(pathA);
@@ -451,7 +467,7 @@ export class KanbanView extends BasesView implements HoverParent {
     const paths = (group?.entries ?? [])
       .map((entry) => entry.file?.path)
       .filter((path): path is string => typeof path === "string");
-    return paths.sort((a, b) => this.compareFileOrder(a, b));
+    return paths.sort((a, b) => this.compareCardOrder(columnName, a, b));
   }
 
   // ---------------------------------------------------------------------------
@@ -776,7 +792,9 @@ export class KanbanView extends BasesView implements HoverParent {
     for (const path of pathsToMove) {
       this.optimisticMoves.set(path, targetColumnName);
     }
-    this.optimisticColumnOrders.set(targetColumnName, fullOrderedPaths);
+    if (this.isManualCardOrder()) {
+      this.optimisticColumnOrders.set(targetColumnName, fullOrderedPaths);
+    }
 
     try {
       await this.applyBatchUpdate(async () => {
@@ -838,7 +856,7 @@ export class KanbanView extends BasesView implements HoverParent {
     orderedPaths: string[],
     pathsToAssign: string[],
   ): Promise<void> {
-    if (pathsToAssign.length === 0) return;
+    if (!this.isManualCardOrder() || pathsToAssign.length === 0) return;
 
     const startIdx = orderedPaths.indexOf(pathsToAssign[0]);
     const prevPath = startIdx > 0 ? orderedPaths[startIdx - 1] : null;
